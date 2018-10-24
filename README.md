@@ -1,5 +1,5 @@
 # mpu9250-spi-maevarm
-read 9-DOF inertial measurement unit (IMU) data with a microcontroller via SPI
+_reads 9-DOF inertial measurement unit (IMU) data to a MAEVARM M2 microcontroller via SPI_
 
 Functions |
 --------- |
