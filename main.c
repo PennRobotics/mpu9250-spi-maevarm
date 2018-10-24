@@ -17,7 +17,7 @@ void _m_mpu9250_calibrate_gyro();
 
 int main()
 {
-  m_spi_init();
+  m_spi_init();  // TODO-lo: move into m_mpu9250_init()
   m_mpu9250_init();
   m_usb_init();
   for(;;)
