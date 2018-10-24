@@ -2,6 +2,7 @@
 
 uint8_t read_spi_byte();
 void write_spi_byte(uint8_t);
+uint8_t exchange_spi_byte(uint8_t);
 
 void m_spi_init()
 {
@@ -63,4 +64,12 @@ void write_spi_byte(uint8_t byte)
   SPDR = byte;
   while(!check(SPSR, SPIF));
   clear(SPSR, SPIF);
+}
+
+uint8_t exchange_spi_byte(uint8_t byte)
+{
+  SPDR = byte;
+  while(!check(SPSR, SPIF));
+  clear(SPSR, SPIF);
+  return SPDR;
 }
