@@ -9,6 +9,8 @@ Function | returns
 **`m_read_spi_register(reg)`** | unsigned byte
 **`m_read_spi_registers(start_reg, count, *dest)`** | _no_
 
+_all parameter variables are unsigned bytes or unsigned byte pointers_
+
 - [x] Initialization of IMU
 - [ ] Set custom parameters
   - [ ] accel range
