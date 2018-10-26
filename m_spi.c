@@ -33,11 +33,26 @@ uint8_t m_read_spi_register(uint8_t reg)
 #define  READ_FLAG  0x80
 #endif
   uint8_t response = 0xFF;
-  CS_HIGH();
+  SELECT_D1();
   write_spi_byte(reg | READ_FLAG);
   response = read_spi_byte();
-  CS_LOW();
+  DESELECT_D1();
   return response;
+}
+
+void m_read_spi_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
+{
+#ifndef  READ_FLAG
+#define  READ_FLAG  0x80
+#endif
+  uint8_t i;
+  SELECT_D1();
+  write_spi_byte(start_reg | READ_FLAG);
+  for (i = 0; i < count; i++)
+  {
+    dest[i] = read_spi_byte();
+  }
+  DESELECT_D1();
 }
 
 void m_write_spi_register(uint8_t reg, uint8_t val)
@@ -45,10 +60,10 @@ void m_write_spi_register(uint8_t reg, uint8_t val)
 #ifndef  WRITE_FLAG
 #define  WRITE_FLAG  0x00
 #endif
-  CS_HIGH();
+  SELECT_D1();
   write_spi_byte(reg | WRITE_FLAG);
   write_spi_byte(val);
-  CS_LOW();
+  DESELECT_D1();
 }
 
 uint8_t read_spi_byte()
