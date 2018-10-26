@@ -1,8 +1,6 @@
 #ifndef M_SS_H
 #define M_SS_H
 
-#define  MPU9250_REG_AXH  0x3B
-
 #include "m_general.h"
 #include "m_usb.h"
 

@@ -1,7 +1,6 @@
 // TODO-hi: copy all mpu functions into here!
 // TODO-hi: also, write/read mpu regs and write/read ak regs
 
-#define  EXT_SENS_DATA_00  0x49
 #define  ACCEL_OUT  0x3B
 #define  GYRO_OUT  0x43
 #define  TEMP_OUT  0x41
