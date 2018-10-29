@@ -12,6 +12,7 @@
 #define  DESELECT_D1()  set(PORTD, 1)
 
 void m_mpu9250_init();
+void m_mpu9250_set_accel(uint8_t);
 void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
 void m_write_spi_mag_register(uint8_t, uint8_t);
 uint8_t m_read_spi_register(uint8_t);
