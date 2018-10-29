@@ -115,16 +115,44 @@ void m_mpu9250_set_gyro(g_range_t gyro_range)
   // TODO: restore speed
 }
 
+void m_mpu9250_fast_mode()
+{
+  _fchoice_accel = 0;
+  _fchoice_gyro = 0;
+#ifndef  ACCEL_FCHOICE_OFF
+#define  ACCEL_FCHOICE_OFF  0x08
+#define  GYRO_FCHOICE_OFF  0x01
+#endif
+  // TODO: set lpf_accel_bw_t-type variable to ACC_LPF_1046HZ
+  m_write_spi_register(ACCEL_CONFIG2, ACCEL_FCHOICE_OFF);
+  // TODO: set lpf_gyro_bw_t-type variable to GY_LPF_8800HZ
+  switch (_gyro_range)
+  {
+    case GYRO_250DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_250DPS | GYRO_FCHOICE_OFF);
+      break;
+    case GYRO_500DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_500DPS | GYRO_FCHOICE_OFF);
+      break;
+    case GYRO_1000DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_1000DPS | GYRO_FCHOICE_OFF);
+      break;
+    case GYRO_2000DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_2000DPS | GYRO_FCHOICE_OFF);
+      break;
+  }
+}
+
 void m_read_spi_mag_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
 {
 #ifndef  I2C_READ_FLAG
 #define  I2C_READ_FLAG  0x80
 #endif
-  m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
-  m_write_spi_register(I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
-  m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
-  _delay_ms(1);
-  m_read_spi_registers(EXT_SENS_DATA_00, count, dest);
+m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
+m_write_spi_register(I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
+m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
+_delay_ms(1);
+m_read_spi_registers(EXT_SENS_DATA_00, count, dest);
 }
 
 void m_write_spi_mag_register(uint8_t reg, uint8_t val)

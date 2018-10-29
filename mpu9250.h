@@ -31,8 +31,9 @@ typedef enum
 {
   FREQ_32KHZ,
   FREQ_8KHZ,
+  FREQ_4KHZ,
   FREQ_1KHZ
-} freq_t;
+} freq_t;  // TODO
 
 typedef enum
 {
@@ -44,7 +45,7 @@ typedef enum
   ACC_LPF_21HZ,
   ACC_LPF_10HZ,
   ACC_LPF_5HZ
-} lpf_accel_bw_t;
+} lpf_accel_bw_t;  // TODO
 
 typedef enum
 {
@@ -57,7 +58,7 @@ typedef enum
   GY_LPF_20HZ,
   GY_LPF_10HZ,
   GY_LPF_5HZ
-} lpf_gyro_bw_t;
+} lpf_gyro_bw_t;  // TODO
 
 extern uint8_t _buffer[];
 
@@ -71,7 +72,7 @@ uint8_t _fchoice_gyro;
 void m_mpu9250_init();
 void m_mpu9250_set_accel(a_range_t);
 void m_mpu9250_set_gyro(g_range_t);
-void m_mpu9250_set_freq(freq_t);
+void m_mpu9250_fast_mode();
 void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
 void m_write_spi_mag_register(uint8_t, uint8_t);
 uint8_t m_read_spi_register(uint8_t);

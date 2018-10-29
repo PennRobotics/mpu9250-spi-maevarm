@@ -13,14 +13,53 @@ void m_spi_init()
   clear(PORTB, 1);  // SCLK starts low
   CS_HIGH();  // CS starts high
 
-  // SPEED CONFIG (250kHz)
-  clear(SPCR, SPR0);
-  set(SPCR, SPR1);
-  clear(SPSR, SPI2X);
+  m_spi_speed(SPI_250KHZ);
 
   // ENABLE IN MASTER MODE
   set(SPCR, SPE);
   set(SPCR, MSTR);
+}
+
+void m_spi_speed(spi_freq_t spi_frequency)
+{
+  switch (spi_frequency)
+  {
+    case SPI_125KHZ:
+      set(SPCR, SPR0);
+      set(SPCR, SPR1);
+      clear(SPSR, SPI2X);
+      break;
+    case SPI_250KHZ:
+      clear(SPCR, SPR0);
+      set(SPCR, SPR1);
+      clear(SPSR, SPI2X);
+      break;
+    case SPI_500KHZ:
+      clear(SPCR, SPR0);
+      set(SPCR, SPR1);
+      set(SPSR, SPI2X);
+      break;
+    case SPI_1MHZ:
+      set(SPCR, SPR0);
+      clear(SPCR, SPR1);
+      clear(SPSR, SPI2X);
+      break;
+    case SPI_2MHZ:
+      set(SPCR, SPR0);
+      clear(SPCR, SPR1);
+      set(SPSR, SPI2X);
+      break;
+    case SPI_4MHZ:
+      clear(SPCR, SPR0);
+      clear(SPCR, SPR1);
+      clear(SPSR, SPI2X);
+      break;
+    case SPI_8MHZ:
+      clear(SPCR, SPR0);
+      clear(SPCR, SPR1);
+      set(SPSR, SPI2X);
+      break;
+  }
 }
 
 uint8_t read_spi_byte()
