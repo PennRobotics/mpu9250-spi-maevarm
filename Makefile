@@ -5,7 +5,7 @@
 DEVICE     = atmega32u4
 CLOCK      = 16000000
 
-OBJECTS    = main.o m_bus.o m_spi.o m_usb.o m_ss.o
+OBJECTS    = main.o m_bus.o m_spi.o m_usb.o m_ss.o mpu9250.o
 
 # Tune the lines below only if you know what you are doing:
 
