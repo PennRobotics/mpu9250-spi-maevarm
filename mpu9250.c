@@ -42,7 +42,7 @@ void m_mpu9250_init()  // TODO
   // Done!
 }
 
-void m_mpu9250_set_accel(uint8_t accel_range)
+void m_mpu9250_set_accel(a_range_t accel_range)
 {
   // TODO: SPI low-speed
   switch (accel_range)
@@ -68,7 +68,7 @@ void m_mpu9250_set_accel(uint8_t accel_range)
   // TODO: restore speed
 }
 
-void m_mpu9250_set_gyro(uint8_t gyro_range)
+void m_mpu9250_set_gyro(g_range_t gyro_range)
 {
   // TODO: SPI low-speed
   switch (gyro_range)

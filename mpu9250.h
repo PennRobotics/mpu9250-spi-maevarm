@@ -11,32 +11,32 @@
 #define  SELECT_D1()  clear(PORTD, 1)
 #define  DESELECT_D1()  set(PORTD, 1)
 
-enum a_range_t
+typedef enum
 {
   ACCEL_2G,
   ACCEL_4G,
   ACCEL_8G,
   ACCEL_16G
-};
+} a_range_t;
 
-enum g_range_t
+typedef enum
 {
   GYRO_250DPS,
   GYRO_500DPS,
   GYRO_1000DPS,
   GYRO_2000DPS
-};
+} g_range_t;
 
 extern uint8_t _buffer[];
 
 float _accel_scale;
 float _gyro_scale;
-enum a_range_t _accel_range;
-enum g_range_t _gyro_range;
+a_range_t _accel_range;
+g_range_t _gyro_range;
 
 void m_mpu9250_init();
-void m_mpu9250_set_accel(uint8_t);  // TODO-lo: use enum type
-void m_mpu9250_set_gyro(uint8_t);  // TODO-lo: use enum type
+void m_mpu9250_set_accel(a_range_t);  // TODO-lo: use enum type
+void m_mpu9250_set_gyro(g_range_t);  // TODO-lo: use enum type
 void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
 void m_write_spi_mag_register(uint8_t, uint8_t);
 uint8_t m_read_spi_register(uint8_t);
