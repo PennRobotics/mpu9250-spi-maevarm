@@ -29,9 +29,10 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
     - [ ] interrupt on data ready
     - [ ] get/set gyro bias
     - [ ] get/set accel bias
-    - [ ] etc? (refer to datsheet)
+    - [ ] sensitivity scale factors?
   - [ ] Self-test
   - [ ] Frame sync?
+  - [ ] Sleep and low-power modes
 - [ ] Programs to capture values from serial port
   - [ ] Matlab
   - [ ] etc
