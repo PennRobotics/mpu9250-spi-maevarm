@@ -33,6 +33,8 @@ float _accel_scale;
 float _gyro_scale;
 a_range_t _accel_range;
 g_range_t _gyro_range;
+uint8_t _fchoice_accel;
+uint8_t _fchoice_gyro;
 
 void m_mpu9250_init();
 void m_mpu9250_set_accel(a_range_t);  // TODO-lo: use enum type
