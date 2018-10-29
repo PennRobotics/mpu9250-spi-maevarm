@@ -12,17 +12,18 @@
 #define  DESELECT_D1()  set(PORTD, 1)
 
 void m_mpu9250_init();
+void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
+void m_write_spi_mag_register(uint8_t, uint8_t);
+uint8_t m_read_spi_register(uint8_t);
+void m_read_spi_registers(uint8_t, uint8_t, uint8_t*);
+void m_write_spi_register(uint8_t, uint8_t);
+
 void _m_ak8963_init();
 void _m_ak8963_init_1(uint8_t);
 void _m_ak8963_init_2(uint8_t);
 void _m_ak8963_init_3(uint8_t);
 void _m_ak8963_init_4(uint8_t);
 void _m_mpu9250_calibrate_gyro();
-void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
-void m_write_spi_mag_register(uint8_t, uint8_t);
-uint8_t m_read_spi_register(uint8_t);
-void m_read_spi_registers(uint8_t, uint8_t, uint8_t*);
-void m_write_spi_register(uint8_t, uint8_t);
 
 #define  ACCEL_OUT  0x3B
 #define  GYRO_OUT  0x43

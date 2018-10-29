@@ -44,6 +44,54 @@ void m_mpu9250_init()  // TODO
   // Done!
 }
 
+void m_write_spi_mag_register(uint8_t reg, uint8_t val)
+{
+  m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR);  // Set slave 0 to AK8963 for writing
+  m_write_spi_register(I2C_SLV0_REG, reg);  // Set AK8963 register for writing
+  m_write_spi_register(I2C_SLV0_DO, val);  // Store the data for writing
+  m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | (uint8_t)1);  // Enable I2C and send 1 byte
+  // TODO: read same register on AK8963 to confirm write successful
+}
+
+uint8_t m_read_spi_register(uint8_t reg)
+{
+#ifndef  READ_FLAG
+#define  READ_FLAG  0x80
+#endif
+  uint8_t response = 0xFF;
+  SELECT_D1();
+  write_spi_byte(reg | READ_FLAG);
+  response = read_spi_byte();
+  DESELECT_D1();
+  return response;
+}
+
+void m_read_spi_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
+{
+#ifndef  READ_FLAG
+#define  READ_FLAG  0x80
+#endif
+  uint8_t i;
+  SELECT_D1();
+  write_spi_byte(start_reg | READ_FLAG);
+  for (i = 0; i < count; i++)
+  {
+    dest[i] = read_spi_byte();
+  }
+  DESELECT_D1();
+}
+
+void m_write_spi_register(uint8_t reg, uint8_t val)
+{
+#ifndef  WRITE_FLAG
+#define  WRITE_FLAG  0x00
+#endif
+  SELECT_D1();
+  write_spi_byte(reg | WRITE_FLAG);
+  write_spi_byte(val);
+  DESELECT_D1();
+}
+
 void _m_ak8963_init()
 {
   uint8_t device_idx;
@@ -92,52 +140,4 @@ void m_read_spi_mag_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
   m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
   _delay_ms(1);
   m_read_spi_registers(EXT_SENS_DATA_00, count, dest);
-}
-
-void m_write_spi_mag_register(uint8_t reg, uint8_t val)
-{
-  m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR);  // Set slave 0 to AK8963 for writing
-  m_write_spi_register(I2C_SLV0_REG, reg);  // Set AK8963 register for writing
-  m_write_spi_register(I2C_SLV0_DO, val);  // Store the data for writing
-  m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | (uint8_t)1);  // Enable I2C and send 1 byte
-  // TODO: read same register on AK8963 to confirm write successful
-}
-
-uint8_t m_read_spi_register(uint8_t reg)
-{
-#ifndef  READ_FLAG
-#define  READ_FLAG  0x80
-#endif
-  uint8_t response = 0xFF;
-  SELECT_D1();
-  write_spi_byte(reg | READ_FLAG);
-  response = read_spi_byte();
-  DESELECT_D1();
-  return response;
-}
-
-void m_read_spi_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
-{
-#ifndef  READ_FLAG
-#define  READ_FLAG  0x80
-#endif
-  uint8_t i;
-  SELECT_D1();
-  write_spi_byte(start_reg | READ_FLAG);
-  for (i = 0; i < count; i++)
-  {
-    dest[i] = read_spi_byte();
-  }
-  DESELECT_D1();
-}
-
-void m_write_spi_register(uint8_t reg, uint8_t val)
-{
-#ifndef  WRITE_FLAG
-#define  WRITE_FLAG  0x00
-#endif
-  SELECT_D1();
-  write_spi_byte(reg | WRITE_FLAG);
-  write_spi_byte(val);
-  DESELECT_D1();
 }
