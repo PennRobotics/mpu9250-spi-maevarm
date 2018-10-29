@@ -16,8 +16,6 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
 - [ ] MPU-9250
   - [x] Initialization of IMU
   - [ ] Calibrate gyro
-  - [ ] Calibrate accel
-  - [ ] Calibrate mag
   - [ ] Set custom parameters
     - [x] accel range
     - [x] gyro range
@@ -31,6 +29,8 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
     - [ ] get/set accel bias
     - [ ] sensitivity scale factors?
   - [ ] Self-test
+  - [ ] Accel calibration routine
+  - [ ] Mag calibration routine
   - [ ] Frame sync?
   - [ ] Sleep and low-power modes
 - [ ] Programs to capture values from serial port
