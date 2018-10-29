@@ -12,6 +12,7 @@ int main()
 {
   m_clockdivide(0);
   m_mpu9250_init();
+  m_mpu9250_fast_mode();
   m_usb_init();
 
   for(;;)
@@ -24,7 +25,5 @@ int main()
 
     for (i = 0; i < 10; i++)  { write_int16_to_usb(data[i]); }
     write_newline_to_usb();
-
-    _delay_ms(100);
   }
 }

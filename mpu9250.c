@@ -141,6 +141,7 @@ void m_mpu9250_fast_mode()
       m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_2000DPS | GYRO_FCHOICE_OFF);
       break;
   }
+  m_spi_speed(SPI_8MHZ);
 }
 
 void m_read_spi_mag_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
