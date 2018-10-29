@@ -112,6 +112,18 @@ void m_mpu9250_set_gyro(uint8_t gyro_scale)
   // TODO: restore speed
 }
 
+void m_read_spi_mag_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
+{
+#ifndef  I2C_READ_FLAG
+#define  I2C_READ_FLAG  0x80
+#endif
+  m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
+  m_write_spi_register(I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
+  m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
+  _delay_ms(1);
+  m_read_spi_registers(EXT_SENS_DATA_00, count, dest);
+}
+
 void m_write_spi_mag_register(uint8_t reg, uint8_t val)
 {
   m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR);  // Set slave 0 to AK8963 for writing
@@ -197,15 +209,3 @@ void _m_ak8963_init_4(uint8_t cs_idx)
 }
 
 void _m_mpu9250_calibrate_gyro()  {} // TODO-hi (see bolderflight/mpu9250.cpp:637)
-
-void m_read_spi_mag_registers(uint8_t start_reg, uint8_t count, uint8_t *dest)
-{
-#ifndef  I2C_READ_FLAG
-#define  I2C_READ_FLAG  0x80
-#endif
-  m_write_spi_register(I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
-  m_write_spi_register(I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
-  m_write_spi_register(I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
-  _delay_ms(1);
-  m_read_spi_registers(EXT_SENS_DATA_00, count, dest);
-}
