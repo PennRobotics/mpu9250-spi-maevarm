@@ -5,8 +5,10 @@ void m_mpu9250_init()  // TODO
   uint8_t device_idx;
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
   {
-    CS_D1();
+    CS_D1();  // TODO: Use proper chip select for each device_idx
     m_spi_init();
+
+    // TODO
     m_write_spi_register(PWR_MGMT_1, CLK_PLL);
     m_write_spi_register(USER_CTRL, I2C_MST_EN);
     m_write_spi_register(I2C_MST_CTRL, I2C_MST_CLK);
@@ -15,28 +17,47 @@ void m_mpu9250_init()  // TODO
     _delay_ms(1);
     m_write_spi_mag_register(AK8963_CNTL2, AK8963_RESET);
     m_write_spi_register(PWR_MGMT_1, CLK_PLL);
+
+    // Sensor ID verification
     uint8_t whoami = m_read_spi_register(WHO_AM_I);
     if ((whoami != 0x71) && (whoami != 0x73))  { m_red(ON); while(1); }  else  { /*DEBUG*/m_green(ON); m_wait(50); m_green(OFF); m_wait(50); }
+
+    // TODO
     m_write_spi_register(PWR_MGMT_2, SEN_ENABLE);
+
+    // Accel and gyro resolution
     m_write_spi_register(ACCEL_CONFIG, ACCEL_FS_SEL_16G);
     _accel_scale = 16.0f/32767.5f;
     _accel_range = ACCEL_16G;
     m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_2000DPS);
     _gyro_scale = 2000.0f / 32767.5f;
     _gyro_range = GYRO_2000DPS;
+
+    // DLPF
     m_write_spi_register(ACCEL_CONFIG2, ACCEL_DLPF_184);
     m_write_spi_register(CONFIG, GYRO_DLPF_184);
     /// _bandwidth = DLPF_BANDWIDTH_184;
+
+    // Sample rate divider
     m_write_spi_register(SMPDIV, 0x00);
     /// _srd = 0;
+
+    // TODO
     m_write_spi_register(USER_CTRL, I2C_MST_EN);
     m_write_spi_register(I2C_MST_CTRL, I2C_MST_CLK);
   }
-  _m_ak8963_init();
+  _m_ak8963_init();  // Compass setup
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
   {
+    // TODO
     m_write_spi_register(PWR_MGMT_1, CLK_PLL);
     m_read_spi_mag_registers(AK8963_HXL, 7, _buffer);  // Get 7 bytes of data from magnetometer at sample rate
+
+    // TODO
+    _fchoice_accel = 1;  // By default, users may select sample freq
+    _fchoice_gyro = 1;
+
+    // TODO
     _m_mpu9250_calibrate_gyro();
   }
   // Done!
@@ -156,6 +177,7 @@ void m_write_spi_register(uint8_t reg, uint8_t val)
 
 void _m_ak8963_init()
 {
+  // TODO: Use proper chip select for each device_idx, in each subroutine
   uint8_t device_idx;
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_1(device_idx); } _delay_ms(100);
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_2(device_idx); } _delay_ms(100);
