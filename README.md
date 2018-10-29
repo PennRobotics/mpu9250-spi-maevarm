@@ -4,6 +4,8 @@ _reads 9-DOF inertial measurement unit (IMU) data to a MAEVARM M2 microcontrolle
 Function | returns
 -------- | -------
 **`m_mpu9250_init()`** | _no_
+**`m_mpu9250_set_accel(accel_scale)`** | _no_
+**`m_mpu9250_set_gyro(gyro_scale)`** | _no_
 **`m_spi_init()`** | _no_
 **`m_write_spi_register(reg, val)`** | _no_
 **`m_read_spi_register(reg)`** | unsigned byte
