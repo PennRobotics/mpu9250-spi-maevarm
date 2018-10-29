@@ -21,7 +21,8 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
   - [ ] Set custom parameters
     - [x] accel range
     - [x] gyro range
-    - [ ] DLPF bandwidth
+    - [ ] bypass DLPF
+    - [ ] set DLPF bandwidth
     - [ ] sample rate
     - [ ] FIFO
     - [ ] wake-on-motion
@@ -29,6 +30,7 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
     - [ ] get/set gyro bias
     - [ ] get/set accel bias
     - [ ] etc? (refer to datsheet)
+  - [ ] Self-test
   - [ ] Frame sync?
 - [ ] Programs to capture values from serial port
   - [ ] Matlab
