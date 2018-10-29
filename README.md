@@ -13,21 +13,23 @@ Function | returns | in
 
 _all parameter variables are unsigned bytes or unsigned byte pointers_
 
-- [x] Initialization of IMU
-- [ ] Calibrate gyro
-- [ ] Calibrate accel
-- [ ] Calibrate mag
-- [ ] Set custom parameters
-  - [x] accel range
-  - [x] gyro range
-  - [ ] DLPF bandwidth
-  - [ ] sample rate
-  - [ ] FIFO
-  - [ ] wake-on-motion
-  - [ ] interrupt on data ready
-  - [ ] get/set gyro bias
-  - [ ] get/set accel bias
-  - [ ] etc? (refer to datsheet)
+- [ ] MPU-9250
+  - [x] Initialization of IMU
+  - [ ] Calibrate gyro
+  - [ ] Calibrate accel
+  - [ ] Calibrate mag
+  - [ ] Set custom parameters
+    - [x] accel range
+    - [x] gyro range
+    - [ ] DLPF bandwidth
+    - [ ] sample rate
+    - [ ] FIFO
+    - [ ] wake-on-motion
+    - [ ] interrupt on data ready
+    - [ ] get/set gyro bias
+    - [ ] get/set accel bias
+    - [ ] etc? (refer to datsheet)
+  - [ ] Frame sync?
 - [ ] Programs to capture values from serial port
   - [ ] Matlab
   - [ ] etc
