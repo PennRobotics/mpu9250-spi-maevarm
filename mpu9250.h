@@ -27,6 +27,38 @@ typedef enum
   GYRO_2000DPS
 } g_range_t;
 
+typedef enum
+{
+  FREQ_32KHZ,
+  FREQ_8KHZ,
+  FREQ_1KHZ
+} freq_t;
+
+typedef enum
+{
+  ACC_LPF_1046HZ,
+  ACC_LPF_420HZ,
+  ACC_LPF_218HZ,
+  ACC_LPF_99HZ,
+  ACC_LPF_45HZ,
+  ACC_LPF_21HZ,
+  ACC_LPF_10HZ,
+  ACC_LPF_5HZ
+} lpf_accel_bw_t;
+
+typedef enum
+{
+  GY_LPF_8800HZ,
+  GY_LPF_3600HZ,
+  GY_LPF_250HZ,
+  GY_LPF_184HZ,
+  GY_LPF_92HZ,
+  GY_LPF_41HZ,
+  GY_LPF_20HZ,
+  GY_LPF_10HZ,
+  GY_LPF_5HZ
+} lpf_gyro_bw_t;
+
 extern uint8_t _buffer[];
 
 float _accel_scale;
@@ -39,6 +71,7 @@ uint8_t _fchoice_gyro;
 void m_mpu9250_init();
 void m_mpu9250_set_accel(a_range_t);
 void m_mpu9250_set_gyro(g_range_t);
+void m_mpu9250_set_freq(freq_t);
 void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
 void m_write_spi_mag_register(uint8_t, uint8_t);
 uint8_t m_read_spi_register(uint8_t);
