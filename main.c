@@ -8,7 +8,7 @@ void setup_timer();
 volatile int16_t stream = 0;
 volatile uint32_t time = 0;
 uint8_t _buffer[21] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int16_t data[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+int16_t data[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 uint32_t *time_ptr = (uint32_t*)&data;
 
 // TODO-lo: Transform accel and gyro to match magnetometer (see bolderflight/mpu9250.h:189)
@@ -25,7 +25,6 @@ int main()
   {
     uint8_t i, incoming;
 
-    // Continuously read IMU data into the data vector
     m_read_spi_registers(ACCEL_OUT, 21, _buffer);
     for (i = 0; i <  7; i++)  { data[i+2] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
     for (i = 7; i < 10; i++)  { data[i+2] = (((int16_t)_buffer[2*i+1]) << 8) | _buffer[2*i]; }
@@ -72,8 +71,7 @@ ISR(TIMER1_COMPA_vect)
   if (stream)
   {
     uint8_t i;
-    for (i = 0; i < 12; i++)  { write_int16_to_usb(data[i]); }
-    write_newline_to_usb();
+    usb_serial_write((uint8_t*)data,40);
     (*time_ptr)++;
   }
 }
