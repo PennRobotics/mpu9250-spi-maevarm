@@ -13,8 +13,8 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
 
 - [x] Initialization of IMU
 - [ ] Set custom parameters
-  - [ ] accel range
-  - [ ] gyro range
+  - [x] accel range
+  - [x] gyro range
   - [ ] sample rate
   - [ ] DLPF
   - [ ] etc

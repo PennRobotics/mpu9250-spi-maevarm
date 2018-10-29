@@ -10,6 +10,14 @@ enum accel_range
   ACCEL_16G
 };
 
+enum gyro_range
+{
+  GYRO_250DPS,
+  GYRO_500DPS,
+  GYRO_1000DPS,
+  GYRO_2000DPS
+};
+
 void m_mpu9250_init()  // TODO
 {
   uint8_t device_idx;
@@ -32,7 +40,7 @@ void m_mpu9250_init()  // TODO
     /// _accel_scale = G * 16.0f/32767.5f;
     /// _accel_range = ACCEL_16G;
     m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_2000DPS);
-    /// _gyro_scale = 2000.0f/32767.5f;
+    /// _gyro_scale = _d2r * 2000.0f/32767.5f;  // TODO: what is _d2r?
     /// _gyro_range = GYRO_2000DPS;
     m_write_spi_register(ACCEL_CONFIG2, ACCEL_DLPF_184);
     m_write_spi_register(CONFIG, GYRO_DLPF_184);
@@ -75,6 +83,32 @@ void m_mpu9250_set_accel(uint8_t accel_scale)
       break;
   }
   /// _accel_range = accel_scale;
+  // TODO: restore speed
+}
+
+void m_mpu9250_set_gyro(uint8_t gyro_scale)
+{
+  // TODO: SPI low-speed
+  switch (gyro_scale)
+  {
+    case GYRO_250DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_250DPS);
+      /// _gyro_scale = _d2r * 250.0f/32767.5f;  // TODO: _d2r
+      break;
+    case GYRO_500DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_500DPS);
+      /// _gyro_scale = _d2r * 500.0f/32767.5f;  // TODO: _d2r
+      break;
+    case GYRO_1000DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_1000DPS);
+      /// _gyro_scale = _d2r * 1000.0f/32767.5f;  // TODO: _d2r
+      break;
+    case GYRO_2000DPS:
+      m_write_spi_register(GYRO_CONFIG, GYRO_FS_SEL_2000DPS);
+      /// _gyro_scale = _d2r * 2000.0f/32767.5f;  // TODO: _d2r
+      break;
+  }
+  /// _gyro_range = gyro_scale;
   // TODO: restore speed
 }
 
