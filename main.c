@@ -13,15 +13,18 @@ int main()
   m_clockdivide(0);
   m_mpu9250_init();
   m_usb_init();
+
   for(;;)
   {
     uint8_t i;
+
     m_read_spi_registers(ACCEL_OUT, 21, _buffer);
-    for (i = 0; i < 7; i++)  { data[i] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
+    for (i = 0; i <  7; i++)  { data[i] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
     for (i = 7; i < 10; i++)  { data[i] = (((int16_t)_buffer[2*i+1]) << 8) | _buffer[2*i]; }
+
     for (i = 0; i < 10; i++)  { write_int16_to_usb(data[i]); }
     write_newline_to_usb();
+
     _delay_ms(100);
-    // */
   }
 }
