@@ -5,11 +5,21 @@
 #include "m_spi.h"
 #include <stdlib.h>
 
-#define  NUM_IMU  1
+#define  NUM_IMU  2
 
-#define  CS_D1()  set(DDRD, 1);
+#define  CS_D1()  set(DDRD, 1)
 #define  SELECT_D1()  clear(PORTD, 1)
 #define  DESELECT_D1()  set(PORTD, 1)
+
+#define  CS_D2()  set(DDRD, 2)
+#define  SELECT_D2()  clear(PORTD, 2)
+#define  DESELECT_D2()  set(PORTD, 2)
+
+typedef enum
+{
+  PIN_D1,
+  PIN_D2
+} m2_gpio_t;
 
 typedef enum
 {
@@ -62,22 +72,24 @@ typedef enum
 
 extern uint8_t _buffer[];
 
-float _accel_scale;
-float _gyro_scale;
-a_range_t _accel_range;
-g_range_t _gyro_range;
-uint8_t _fchoice_accel;
-uint8_t _fchoice_gyro;
+m2_gpio_t imu_pin_list[NUM_IMU];
+
+float _accel_scale[NUM_IMU];
+float _gyro_scale[NUM_IMU];
+a_range_t _accel_range[NUM_IMU];
+g_range_t _gyro_range[NUM_IMU];
+uint8_t _fchoice_accel[NUM_IMU];
+uint8_t _fchoice_gyro[NUM_IMU];
 
 void m_mpu9250_init();
-void m_mpu9250_set_accel(a_range_t);
-void m_mpu9250_set_gyro(g_range_t);
-void m_mpu9250_fast_mode();
-void m_read_spi_mag_registers(uint8_t, uint8_t, uint8_t*);
-void m_write_spi_mag_register(uint8_t, uint8_t);
-uint8_t m_read_spi_register(uint8_t);
-void m_read_spi_registers(uint8_t, uint8_t, uint8_t*);
-void m_write_spi_register(uint8_t, uint8_t);
+void m_mpu9250_set_accel(m2_gpio_t, a_range_t);
+void m_mpu9250_set_gyro(m2_gpio_t, g_range_t);
+void m_mpu9250_fast_mode(uint8_t);
+void m_read_spi_mag_registers(m2_gpio_t, uint8_t, uint8_t, uint8_t*);
+void m_write_spi_mag_register(m2_gpio_t, uint8_t, uint8_t);
+uint8_t m_read_spi_register(m2_gpio_t, uint8_t);
+void m_read_spi_registers(m2_gpio_t, uint8_t, uint8_t, uint8_t*);
+void m_write_spi_register(m2_gpio_t, uint8_t, uint8_t);
 
 void _m_ak8963_init();
 void _m_ak8963_init_1(uint8_t);

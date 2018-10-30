@@ -16,8 +16,11 @@ uint32_t *time_ptr = (uint32_t*)&data;
 int main()
 {
   m_clockdivide(0);
+  m_spi_init();
   m_mpu9250_init();
-  m_mpu9250_fast_mode();
+  m_mpu9250_fast_mode(PIN_D1);  // TODO-lo: Eventually use a for-loop lookup
+  m_mpu9250_fast_mode(PIN_D2);
+  m_spi_speed(SPI_8MHZ);
   m_usb_init();
   setup_timer();
 
@@ -25,9 +28,16 @@ int main()
   {
     uint8_t i, incoming;
 
-    m_read_spi_registers(ACCEL_OUT, 21, _buffer);
-    for (i = 0; i <  7; i++)  { data[i+2] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
-    for (i = 7; i < 10; i++)  { data[i+2] = (((int16_t)_buffer[2*i+1]) << 8) | _buffer[2*i]; }
+    m_read_spi_registers(PIN_D1, ACCEL_OUT, 21, _buffer);
+    for (i = 0; i <  3; i++)  { data[i+2] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
+    for (i = 4; i <  7; i++)  { data[i+1] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
+    for (i = 7; i < 10; i++)  { data[i+1] = (((int16_t)_buffer[2*i+1]) << 8) | _buffer[2*i]; }
+
+    m_read_spi_registers(PIN_D2, ACCEL_OUT, 21, _buffer);
+    for (i = 0; i <  3; i++)  { data[i+11] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
+    for (i = 4; i <  7; i++)  { data[i+10] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
+    for (i = 7; i < 10; i++)  { data[i+10] = (((int16_t)_buffer[2*i+1]) << 8) | _buffer[2*i]; }
+    // TODO-lo: Possibility of broadcasting "read" command to each device, then selecting each device serially for response?
 
     if (m_usb_rx_available())
     {
@@ -70,7 +80,6 @@ ISR(TIMER1_COMPA_vect)
 {
   if (stream)
   {
-    uint8_t i;
     usb_serial_write((uint8_t*)data,40);
     (*time_ptr)++;
   }
