@@ -13,8 +13,6 @@ void m_spi_init()
   clear(PORTB, 1);  // SCLK starts low
   CS_HIGH();  // CS starts high
 
-  m_spi_speed(SPI_250KHZ);
-
   // ENABLE IN MASTER MODE
   set(SPCR, SPE);
   set(SPCR, MSTR);

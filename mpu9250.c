@@ -13,13 +13,16 @@ void m_mpu9250_init()  // TODO
     {
       case PIN_D1:
         CS_D1();
+        DESELECT_D1();
         break;
       case PIN_D2:
         CS_D2();
+        DESELECT_D2();
         break;
     }
 
     // TODO
+    _delay_ms(1);
     m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);
     m_write_spi_register(cs_pin, USER_CTRL, I2C_MST_EN);
     m_write_spi_register(cs_pin, I2C_MST_CTRL, I2C_MST_CLK);
