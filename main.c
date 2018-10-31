@@ -7,8 +7,8 @@ void setup_timer();
 
 volatile int16_t stream = 0;
 volatile uint32_t time = 0;
-uint8_t _buffer[21] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int16_t data[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t _buffer[21] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0};
+int16_t data[20] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 uint32_t *time_ptr = (uint32_t*)&data;
 
 // TODO-lo: Transform accel and gyro to match magnetometer (see bolderflight/mpu9250.h:189)
@@ -20,7 +20,7 @@ int main()
   m_spi_speed(SPI_125KHZ);
   m_mpu9250_init();
   m_mpu9250_fast_mode(PIN_D1);  // TODO-lo: Eventually use a for-loop lookup
-  m_mpu9250_fast_mode(PIN_D2);
+///  m_mpu9250_fast_mode(PIN_D2);
   m_spi_speed(SPI_1MHZ);
   m_usb_init();
   setup_timer();
