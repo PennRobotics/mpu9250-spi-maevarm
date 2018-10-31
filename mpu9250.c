@@ -21,8 +21,13 @@ void m_mpu9250_init()  // TODO
         break;
     }
 
-    // TODO
     _delay_ms(1);
+  }
+  for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
+  {
+    m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
+    // TODO
     m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);
     m_write_spi_register(cs_pin, USER_CTRL, I2C_MST_EN);
     m_write_spi_register(cs_pin, I2C_MST_CTRL, I2C_MST_CLK);
