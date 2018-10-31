@@ -5,7 +5,10 @@
 #include "m_spi.h"
 #include <stdlib.h>
 
-#define  NUM_IMU  2
+#define  NUM_IMU  1
+
+#define  IGNORE_BAD_WHOAMI  true
+#define  LED_DELAY_MS  250
 
 #define  CS_D1()  set(DDRD, 1)
 #define  SELECT_D1()  clear(PORTD, 1)

@@ -1,6 +1,7 @@
 #include "mpu9250.h"
 
-m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1, PIN_D2};
+m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1};
+///m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1, PIN_D2};
 
 void m_mpu9250_init()  // TODO
 {
@@ -42,15 +43,18 @@ void m_mpu9250_init()  // TODO
     if ((whoami != 0x71) && (whoami != 0x73))
     {
       m_red(ON);
-      while(1);
+      if (!IGNORE_BAD_WHOAMI)  { while(1); }
+      _delay_ms(LED_DELAY_MS);
+      m_red(OFF);
+      _delay_ms(LED_DELAY_MS);
     }
     else
     {
       /*DEBUG*/
       m_green(ON);
-      m_wait(50);
+      _delay_ms(LED_DELAY_MS);
       m_green(OFF);
-      m_wait(50);
+      _delay_ms(LED_DELAY_MS);
     }
 
     // TODO
@@ -287,15 +291,18 @@ void _m_ak8963_init_1(uint8_t device_idx)
   if (whoami_compass[0] != 0x48)
   {
     m_red(ON);
-    while(1);
+    if (!IGNORE_BAD_WHOAMI)  { while(1); }
+    _delay_ms(LED_DELAY_MS);
+    m_red(OFF);
+    _delay_ms(LED_DELAY_MS);
   }
   else
   {
     /*DEBUG*/
     m_green(ON);
-    m_wait(50);
+    _delay_ms(LED_DELAY_MS);
     m_green(OFF);
-    m_wait(50);
+    _delay_ms(LED_DELAY_MS);
   }
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
 }
