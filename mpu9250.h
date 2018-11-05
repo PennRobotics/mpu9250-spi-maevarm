@@ -5,7 +5,7 @@
 #include "m_spi.h"
 #include <stdlib.h>
 
-#define  NUM_IMU  1
+#define  NUM_IMU  2
 
 #define  IGNORE_BAD_WHOAMI  true
 #define  LED_DELAY_MS  250

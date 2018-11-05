@@ -1,7 +1,6 @@
 #include "mpu9250.h"
 
-m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1};
-///m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1, PIN_D2};
+m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1, PIN_D2};
 
 void m_mpu9250_init()  // TODO
 {
@@ -21,9 +20,8 @@ void m_mpu9250_init()  // TODO
         DESELECT_D2();
         break;
     }
-
-    _delay_ms(1);
   }
+  _delay_ms(5);
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
   {
     m2_gpio_t cs_pin = imu_pin_list[device_idx];
@@ -34,7 +32,7 @@ void m_mpu9250_init()  // TODO
     m_write_spi_register(cs_pin, I2C_MST_CTRL, I2C_MST_CLK);
     m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
     m_write_spi_register(cs_pin, PWR_MGMT_1, PWR_RESET);
-    _delay_ms(1);
+    _delay_ms(5);
     m_write_spi_mag_register(cs_pin, AK8963_CNTL2, AK8963_RESET);
     m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);
 
@@ -50,7 +48,6 @@ void m_mpu9250_init()  // TODO
     }
     else
     {
-      /*DEBUG*/
       m_green(ON);
       _delay_ms(LED_DELAY_MS);
       m_green(OFF);
@@ -191,7 +188,7 @@ void m_read_spi_mag_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count
 m_write_spi_register(cs_pin, I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
 m_write_spi_register(cs_pin, I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
 m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
-_delay_ms(1);
+_delay_ms(5);  // TODO TODO
 m_read_spi_registers(cs_pin, EXT_SENS_DATA_00, count, dest);
 }
 
@@ -202,6 +199,7 @@ void m_write_spi_mag_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
   m_write_spi_register(cs_pin, I2C_SLV0_DO, val);  // Store the data for writing
   m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | (uint8_t)1);  // Enable I2C and send 1 byte
   // TODO: read same register on AK8963 to confirm write successful
+  _delay_ms(5);  // TODO TODO
 }
 
 #ifndef  CHIP_SELECT
@@ -298,7 +296,6 @@ void _m_ak8963_init_1(uint8_t device_idx)
   }
   else
   {
-    /*DEBUG*/
     m_green(ON);
     _delay_ms(LED_DELAY_MS);
     m_green(OFF);

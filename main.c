@@ -17,11 +17,11 @@ int main()
 {
   m_clockdivide(0);
   m_spi_init();
-  m_spi_speed(SPI_125KHZ);
+  m_spi_speed(SPI_250KHZ);
   m_mpu9250_init();
   m_mpu9250_fast_mode(PIN_D1);  // TODO-lo: Eventually use a for-loop lookup
-///  m_mpu9250_fast_mode(PIN_D2);
-  m_spi_speed(SPI_1MHZ);
+  m_mpu9250_fast_mode(PIN_D2);
+  m_spi_speed(SPI_2MHZ);
   m_usb_init();
   setup_timer();
 
