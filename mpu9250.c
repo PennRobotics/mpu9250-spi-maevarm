@@ -2,7 +2,7 @@
 
 m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1, PIN_D2};
 
-void m_mpu9250_init()  // TODO
+void m_mpu9250_init()
 {
  uint8_t device_idx;
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
@@ -68,8 +68,8 @@ void m_mpu9250_init()  // TODO
 
 void m_mpu9250_set_accel(uint8_t device_idx, a_range_t accel_range)
 {
-  // TODO: SPI low-speed
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
   switch (accel_range)
   {
     case ACCEL_2G:   _accel_scale[device_idx] =  2.0f / 32767.5f; break;
@@ -78,15 +78,18 @@ void m_mpu9250_set_accel(uint8_t device_idx, a_range_t accel_range)
     case ACCEL_16G:  _accel_scale[device_idx] = 16.0f / 32767.5f; break;
   }
   _accel_range[device_idx] = accel_range;
+
+  spi_freq_t current_freq = _spi_freq;  // Slow down SPI as needed
+  if ((uint8_t)current_freq > (uint8_t)SPI_1MHZ)  { m_spi_speed(SPI_1MHZ); }
   m_write_spi_register(cs_pin, ACCEL_CONFIG, accel_range);
-  // TODO: restore SPI speed in-use when function was called
+  if ((uint8_t)current_freq > (uint8_t)SPI_1MHZ)  { m_spi_speed(current_freq); }
 }
 
 
 void m_mpu9250_set_gyro(uint8_t device_idx, g_range_t gyro_range)
 {
-  // TODO: SPI low-speed
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
   switch (gyro_range)
   {
     case GYRO_250DPS:   _gyro_scale[device_idx] =  250.0f / 32767.5f; break;
@@ -95,8 +98,11 @@ void m_mpu9250_set_gyro(uint8_t device_idx, g_range_t gyro_range)
     case GYRO_2000DPS:  _gyro_scale[device_idx] = 2000.0f / 32767.5f; break;
   }
   _gyro_range[device_idx] = gyro_range;
+
+  spi_freq_t current_freq = _spi_freq;  // Slow down SPI as needed
+  if ((uint8_t)current_freq > (uint8_t)SPI_1MHZ)  { m_spi_speed(SPI_1MHZ); }
   m_write_spi_register(cs_pin, GYRO_CONFIG, gyro_range);
-  // TODO: restore speed
+  if ((uint8_t)current_freq > (uint8_t)SPI_1MHZ)  { m_spi_speed(current_freq); }
 }
 
 
@@ -266,13 +272,14 @@ void _m_ak8963_init_2(uint8_t device_idx)
 }
 
 
+// 4912 = magnetic flux density, in uT; 32760 = 16-bit max of AK8963
 void _m_ak8963_init_3(uint8_t device_idx)
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   m_read_spi_mag_registers(cs_pin, AK8963_ASA, 3, _buffer);  // Get 3 bytes: vx, vy, vz
-  // _mag_scale_x[device_idx] = ((((float)vx) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f;  // TODO: double-check numerical values
-  // _mag_scale_y[device_idx] = ((((float)vy) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f;
-  // _mag_scale_z[device_idx] = ((((float)vz) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f;
+  _mag_scale_x[device_idx] = ((((float)_buffer[0]) - 128.0f) / 256.0f + 1.0f) * 4912.0f / 32760.0f;
+  _mag_scale_y[device_idx] = ((((float)_buffer[1]) - 128.0f) / 256.0f + 1.0f) * 4912.0f / 32760.0f;
+  _mag_scale_z[device_idx] = ((((float)_buffer[2]) - 128.0f) / 256.0f + 1.0f) * 4912.0f / 32760.0f;
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
 }
 

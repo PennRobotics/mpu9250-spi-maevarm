@@ -42,14 +42,6 @@ typedef enum
 
 typedef enum
 {
-  FREQ_32KHZ,
-  FREQ_8KHZ,
-  FREQ_4KHZ,
-  FREQ_1KHZ
-} freq_t;  // TODO
-
-typedef enum
-{
   ACC_LPF_1046HZ = 8,
   ACC_LPF_420HZ = 7,
   ACC_LPF_218HZ_B = 0,
@@ -73,22 +65,33 @@ typedef enum
   GY_LPF_20HZ = 4,
   GY_LPF_10HZ = 5,
   GY_LPF_5HZ = 6
-} lpf_gyro_bw_t;  // TODO
+} lpf_gyro_bw_t;
 
+
+// VARIABLES
 extern uint8_t _buffer[];
 
 m2_gpio_t imu_pin_list[NUM_IMU];
 
 float _accel_scale[NUM_IMU];
 float _gyro_scale[NUM_IMU];
+float _mag_scale_x[NUM_IMU];
+float _mag_scale_y[NUM_IMU];
+float _mag_scale_z[NUM_IMU];
+
 a_range_t _accel_range[NUM_IMU];
 g_range_t _gyro_range[NUM_IMU];
+
 uint8_t _fchoice_accel[NUM_IMU];
 uint8_t _fchoice_gyro[NUM_IMU];
+
 lpf_accel_bw_t _accel_lpf_bandwidth[NUM_IMU];
 lpf_gyro_bw_t _gyro_lpf_bandwidth[NUM_IMU];
+
 uint8_t _srd[NUM_IMU];
 
+
+// FUNCTIONS
 void m_mpu9250_init();
 void m_mpu9250_set_accel(uint8_t, a_range_t);
 void m_mpu9250_set_gyro(uint8_t, g_range_t);
@@ -101,6 +104,8 @@ uint8_t m_read_spi_register(m2_gpio_t, uint8_t);
 void m_read_spi_registers(m2_gpio_t, uint8_t, uint8_t, uint8_t*);
 void m_write_spi_register(m2_gpio_t, uint8_t, uint8_t);
 
+
+// PRIVATE FUNCTIONS
 void _setup_pin_as_chip_select(m2_gpio_t);
 void _m_ak8963_init();
 void _m_ak8963_init_1(uint8_t);

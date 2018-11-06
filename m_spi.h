@@ -9,7 +9,7 @@
 
 typedef enum
 {
-  SPI_125KHZ,
+  SPI_125KHZ = 0,
   SPI_250KHZ,
   SPI_500KHZ,
   SPI_1MHZ,

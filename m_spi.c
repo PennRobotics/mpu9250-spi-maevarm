@@ -58,6 +58,7 @@ void m_spi_speed(spi_freq_t spi_frequency)
       set(SPSR, SPI2X);
       break;
   }
+  _spi_freq = spi_frequency;
 }
 
 uint8_t read_spi_byte()
