@@ -1,10 +1,17 @@
 # mpu9250-spi-maevarm
 _reads 9-DOF inertial measurement unit (IMU) data to a MAEVARM M2 microcontroller via SPI_
 
+
 ### Definitions
 `NUM_IMU  =  2`  
 `IGNORE_BAD_WHOAMI  =  true`  
+`CALIBRATE_GYRO  =  true`  
+`NUM_CALIBRATION_SAMPLES = 128`  
 `LED_DELAY_MS  =  250`  
+
+
+### Public Variables
+`m2_gpio_t  imu_pin_list[NUM_IMU]` - _an array of cs\_pin enums_  
 
 
 ### Pinout
@@ -95,6 +102,7 @@ _all parameter variables are unsigned bytes or unsigned byte pointers_
 -------- |
 `PIN_D1` |
 `PIN_D2` |
+
 
 ## Progress
 - [ ] MPU-9250
