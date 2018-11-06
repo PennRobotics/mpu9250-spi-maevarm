@@ -26,7 +26,7 @@ Function | returns | in
 **`m_mpu9250_set_accel_lpf(index, lpf_accel_bw)`** | _no_ | mpu9250
 **`m_mpu9250_set_gyro_lpf(index, lpf_gyro_bw)`** | _no_ | mpu9250
 **`m_mpu9250_fast_mode(index)`** | _no_ | mpu9250
-**`void m_mpu9250_dump_all_registers()`** | _no_ | mpu9250
+**`m_mpu9250_dump_all_registers()`** | _no_ | mpu9250
 **`m_read_spi_mag_registers(cs_pin, start_reg, count, *dest)`** | _no_ | mpu9250
 **`m_write_spi_mag_register(cs_pin, reg, val)`** | _no_ | mpu9250
 **`m_read_spi_register(cs_pin, reg)`** | unsigned byte | mpu9250
