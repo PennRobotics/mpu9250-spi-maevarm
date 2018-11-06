@@ -8,73 +8,45 @@ void m_mpu9250_init()  // TODO
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
   {
     m2_gpio_t cs_pin = imu_pin_list[device_idx];
-///    USE_PIN_AS_CHIP_SELECT(cs_pin);
-    switch (cs_pin)
-    {
-      case PIN_D1:
-        CS_D1();
-        DESELECT_D1();
-        break;
-      case PIN_D2:
-        CS_D2();
-        DESELECT_D2();
-        break;
-    }
+    _setup_pin_as_chip_select(cs_pin);
   }
+
   _delay_ms(5);
+
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
   {
     m2_gpio_t cs_pin = imu_pin_list[device_idx];
 
-    // TODO
-    m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);
-    m_write_spi_register(cs_pin, USER_CTRL, I2C_MST_EN);
-    m_write_spi_register(cs_pin, I2C_MST_CTRL, I2C_MST_CLK);
-    m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
-    m_write_spi_register(cs_pin, PWR_MGMT_1, PWR_RESET);
+    // Accel and gyro initialization
+    m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);  // Clock source
+    m_write_spi_register(cs_pin, USER_CTRL, I2C_MST_EN);  // Isolate I2C for compass
+    m_write_spi_register(cs_pin, I2C_MST_CTRL, I2C_MST_CLK);  // 400kHz
+    m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);  // Turn off compass
+    m_write_spi_register(cs_pin, PWR_MGMT_1, PWR_RESET);  // Reset registers to defaults
     _delay_ms(5);
-    m_write_spi_mag_register(cs_pin, AK8963_CNTL2, AK8963_RESET);
-    m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);
+    m_write_spi_mag_register(cs_pin, AK8963_CNTL2, AK8963_RESET);  // Reset compass to defaults
+    m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);  // Clock source
 
     // Sensor ID verification
     uint8_t whoami = m_read_spi_register(cs_pin, WHO_AM_I);
-    if ((whoami != 0x71) && (whoami != 0x73))
-    {
-      m_red(ON);
-      if (!IGNORE_BAD_WHOAMI)  { while(1); }
-      _delay_ms(LED_DELAY_MS);
-      m_red(OFF);
-      _delay_ms(LED_DELAY_MS);
-    }
-    else
-    {
-      m_green(ON);
-      _delay_ms(LED_DELAY_MS);
-      m_green(OFF);
-      _delay_ms(LED_DELAY_MS);
-    }
+    _blink_yes_or_no( (whoami == 0x71) || (whoami == 0x73) );
 
-    // TODO
+    // Activate all accel and gyro channels
     m_write_spi_register(cs_pin, PWR_MGMT_2, SEN_ENABLE);
 
-    // Accel and gyro resolution
-    m_write_spi_register(cs_pin, ACCEL_CONFIG, ACCEL_FS_SEL_16G);
-    _accel_scale[device_idx] = 16.0f / 32767.5f;
-    _accel_range[device_idx] = ACCEL_16G;
-    m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_2000DPS);
-    _gyro_scale[device_idx] = 2000.0f / 32767.5f;
-    _gyro_range[device_idx] = GYRO_2000DPS;
+    // Set accel and gyro resolution
+    m_mpu9250_set_accel(device_idx, ACCEL_16G);
+    m_mpu9250_set_gyro(device_idx, GYRO_2000DPS);
 
     // DLPF
-    m_write_spi_register(cs_pin, ACCEL_CONFIG2, ACCEL_DLPF_184);
-    m_write_spi_register(cs_pin, CONFIG, GYRO_DLPF_184);
-    /// _bandwidth[device_idx] = DLPF_BANDWIDTH_184;
+    m_mpu9250_set_accel_lpf(device_idx, ACC_LPF_218HZ);
+    m_mpu9250_set_gyro_lpf(device_idx, GY_LPF_184HZ);
 
     // Sample rate divider
     m_write_spi_register(cs_pin, SMPDIV, 0x00);
-    /// _srd[device_idx] = 0;
+    _srd[device_idx] = 0;
 
-    // TODO
+    // Set IMU as I2C master at 400kHz for compass, isolated from the SPI pins
     m_write_spi_register(cs_pin, USER_CTRL, I2C_MST_EN);
     m_write_spi_register(cs_pin, I2C_MST_CTRL, I2C_MST_CLK);
   }
@@ -85,100 +57,78 @@ void m_mpu9250_init()  // TODO
   {
     m2_gpio_t cs_pin = imu_pin_list[device_idx];
 
-    // TODO
-    m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);
+    m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);  // Clock source
     m_read_spi_mag_registers(cs_pin, AK8963_HXL, 7, _buffer);  // Get 7 bytes of data from magnetometer at sample rate
 
-    // TODO
-    _fchoice_accel[device_idx] = 1;  // By default, users may select sample freq
-    _fchoice_gyro[device_idx] = 1;
-
-    // TODO
     _m_mpu9250_calibrate_gyro(cs_pin);
   }
   // Done!
 }
 
-void m_mpu9250_set_accel(m2_gpio_t cs_pin, a_range_t accel_range)
+
+void m_mpu9250_set_accel(uint8_t device_idx, a_range_t accel_range)
 {
   // TODO: SPI low-speed
+  m2_gpio_t cs_pin = imu_pin_list[device_idx];
   switch (accel_range)
   {
-    case ACCEL_2G:
-      m_write_spi_register(cs_pin, ACCEL_CONFIG, ACCEL_FS_SEL_2G);
-///      _accel_scale = 2.0f/32767.5f;
-      break;
-    case ACCEL_4G:
-      m_write_spi_register(cs_pin, ACCEL_CONFIG, ACCEL_FS_SEL_4G);
-///      _accel_scale = 4.0f/32767.5f;
-      break;
-    case ACCEL_8G:
-      m_write_spi_register(cs_pin, ACCEL_CONFIG, ACCEL_FS_SEL_8G);
-///      _accel_scale = 8.0f/32767.5f;
-      break;
-    case ACCEL_16G:
-      m_write_spi_register(cs_pin, ACCEL_CONFIG, ACCEL_FS_SEL_16G);
-///      _accel_scale = 16.0f/32767.5f;
-      break;
+    case ACCEL_2G:   _accel_scale[device_idx] =  2.0f / 32767.5f; break;
+    case ACCEL_4G:   _accel_scale[device_idx] =  4.0f / 32767.5f; break;
+    case ACCEL_8G:   _accel_scale[device_idx] =  8.0f / 32767.5f; break;
+    case ACCEL_16G:  _accel_scale[device_idx] = 16.0f / 32767.5f; break;
   }
-///  _accel_range = accel_range;
+  _accel_range[device_idx] = accel_range;
+  m_write_spi_register(cs_pin, ACCEL_CONFIG, accel_range);
   // TODO: restore SPI speed in-use when function was called
 }
 
-void m_mpu9250_set_gyro(m2_gpio_t cs_pin, g_range_t gyro_range)
+
+void m_mpu9250_set_gyro(uint8_t device_idx, g_range_t gyro_range)
 {
   // TODO: SPI low-speed
+  m2_gpio_t cs_pin = imu_pin_list[device_idx];
   switch (gyro_range)
   {
-    case GYRO_250DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_250DPS);
-///      _gyro_scale = 250.0f / 32767.5f;
-      break;
-    case GYRO_500DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_500DPS);
-///      _gyro_scale = 500.0f / 32767.5f;
-      break;
-    case GYRO_1000DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_1000DPS);
-///      _gyro_scale = 1000.0f / 32767.5f;
-      break;
-    case GYRO_2000DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_2000DPS);
-///      _gyro_scale = 2000.0f / 32767.5f;
-      break;
+    case GYRO_250DPS:   _gyro_scale[device_idx] =  250.0f / 32767.5f; break;
+    case GYRO_500DPS:   _gyro_scale[device_idx] =  500.0f / 32767.5f; break;
+    case GYRO_1000DPS:  _gyro_scale[device_idx] = 1000.0f / 32767.5f; break;
+    case GYRO_2000DPS:  _gyro_scale[device_idx] = 2000.0f / 32767.5f; break;
   }
-///  _gyro_range = gyro_range;
+  _gyro_range[device_idx] = gyro_range;
+  m_write_spi_register(cs_pin, GYRO_CONFIG, gyro_range);
   // TODO: restore speed
 }
 
-void m_mpu9250_fast_mode(uint8_t device_idx)
+
+void m_mpu9250_set_accel_lpf(uint8_t device_idx, lpf_accel_bw_t bandwidth)
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
-  _fchoice_accel[device_idx] = 0;
-  _fchoice_gyro[device_idx] = 0;
-#ifndef  ACCEL_FCHOICE_OFF
-#define  ACCEL_FCHOICE_OFF  0x08
-#define  GYRO_FCHOICE_OFF  0x01
-#endif
-  // TODO: set lpf_accel_bw_t-type variable to ACC_LPF_1046HZ
-  m_write_spi_register(cs_pin, ACCEL_CONFIG2, ACCEL_FCHOICE_OFF);
-  // TODO: set lpf_gyro_bw_t-type variable to GY_LPF_8800HZ
-  switch (_gyro_range[device_idx])
-  {
-    case GYRO_250DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_250DPS | GYRO_FCHOICE_OFF);
-      break;
-    case GYRO_500DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_500DPS | GYRO_FCHOICE_OFF);
-      break;
-    case GYRO_1000DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_1000DPS | GYRO_FCHOICE_OFF);
-      break;
-    case GYRO_2000DPS:
-      m_write_spi_register(cs_pin, GYRO_CONFIG, GYRO_FS_SEL_2000DPS | GYRO_FCHOICE_OFF);
-      break;
-  }
+
+  _fchoice_accel[device_idx] = (bandwidth == ACC_LPF_1046HZ) ? 0 : 1;
+  _accel_lpf_bandwidth[device_idx] = bandwidth;
+
+  m_write_spi_register(cs_pin, ACCEL_CONFIG2, bandwidth);
 }
+
+
+void m_mpu9250_set_gyro_lpf(uint8_t device_idx, lpf_gyro_bw_t bandwidth)
+{
+  m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
+  _fchoice_gyro[device_idx] = (uint8_t)bandwidth >> 3;
+  _gyro_lpf_bandwidth[device_idx] = bandwidth;
+
+  m_write_spi_register(cs_pin, CONFIG, ((uint8_t)bandwidth & 0b111) | /*TODO-lo:FIFO*/0);
+  m_write_spi_register(cs_pin, GYRO_CONFIG, (uint8_t)_gyro_range[device_idx] | _fchoice_gyro[device_idx]);
+}
+
+
+void m_mpu9250_fast_mode(uint8_t device_idx)
+{
+  m_mpu9250_set_accel_lpf(device_idx, ACC_LPF_1046HZ);
+  m_mpu9250_set_gyro_lpf(device_idx, GY_LPF_8800HZ);
+}
+
 
 void m_read_spi_mag_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count, uint8_t *dest)
 {
@@ -188,9 +138,10 @@ void m_read_spi_mag_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count
 m_write_spi_register(cs_pin, I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
 m_write_spi_register(cs_pin, I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
 m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
-_delay_ms(5);  // TODO TODO
+_delay_ms(5);
 m_read_spi_registers(cs_pin, EXT_SENS_DATA_00, count, dest);
 }
+
 
 void m_write_spi_mag_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
 {
@@ -198,9 +149,10 @@ void m_write_spi_mag_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
   m_write_spi_register(cs_pin, I2C_SLV0_REG, reg);  // Set AK8963 register for writing
   m_write_spi_register(cs_pin, I2C_SLV0_DO, val);  // Store the data for writing
   m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | (uint8_t)1);  // Enable I2C and send 1 byte
-  // TODO: read same register on AK8963 to confirm write successful
-  _delay_ms(5);  // TODO TODO
+  _delay_ms(5);
+  // TODO-lo: read same register on AK8963 to confirm write successful
 }
+
 
 #ifndef  CHIP_SELECT
 #define  CHIP_SELECT(cs) \
@@ -217,6 +169,7 @@ void m_write_spi_mag_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
   } while (0)
 #endif
 
+
 #ifndef  CHIP_DESELECT
 #define  CHIP_DESELECT(cs) \
   do { \
@@ -232,6 +185,7 @@ void m_write_spi_mag_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
   } while (0)
 #endif
 
+
 uint8_t m_read_spi_register(m2_gpio_t cs_pin, uint8_t reg)
 {
 #ifndef  READ_FLAG
@@ -244,6 +198,7 @@ uint8_t m_read_spi_register(m2_gpio_t cs_pin, uint8_t reg)
   CHIP_DESELECT(cs_pin);
   return response;
 }
+
 
 void m_read_spi_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count, uint8_t *dest)
 {
@@ -260,6 +215,7 @@ void m_read_spi_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count, ui
   CHIP_DESELECT(cs_pin);
 }
 
+
 void m_write_spi_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
 {
 #ifndef  WRITE_FLAG
@@ -271,9 +227,20 @@ void m_write_spi_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
   CHIP_DESELECT(cs_pin);
 }
 
+
+// INTERNAL FUNCTIONS
+void _setup_pin_as_chip_select(m2_gpio_t cs_pin)
+{
+  switch (cs_pin)
+  {
+    case PIN_D1:  CS_D1(); DESELECT_D1(); break;
+    case PIN_D2:  CS_D2(); DESELECT_D2(); break;
+  }
+}
+
+
 void _m_ak8963_init()
 {
-  // TODO: Use proper chip select for each device_idx, in each subroutine
   uint8_t device_idx;
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_1(device_idx); } _delay_ms(100);
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_2(device_idx); } _delay_ms(100);
@@ -281,34 +248,23 @@ void _m_ak8963_init()
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_4(device_idx); } _delay_ms(100);
 }
 
+
 void _m_ak8963_init_1(uint8_t device_idx)
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   uint8_t whoami_compass[1] = {0xFF};
   m_read_spi_mag_registers(cs_pin, AK8963_WHO_AM_I, 1, whoami_compass);
-  if (whoami_compass[0] != 0x48)
-  {
-    m_red(ON);
-    if (!IGNORE_BAD_WHOAMI)  { while(1); }
-    _delay_ms(LED_DELAY_MS);
-    m_red(OFF);
-    _delay_ms(LED_DELAY_MS);
-  }
-  else
-  {
-    m_green(ON);
-    _delay_ms(LED_DELAY_MS);
-    m_green(OFF);
-    _delay_ms(LED_DELAY_MS);
-  }
+  _blink_yes_or_no(whoami_compass[0] == 0x48);
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
 }
+
 
 void _m_ak8963_init_2(uint8_t device_idx)
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_FUSE_ROM);
 }
+
 
 void _m_ak8963_init_3(uint8_t device_idx)
 {
@@ -320,10 +276,32 @@ void _m_ak8963_init_3(uint8_t device_idx)
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
 }
 
+
 void _m_ak8963_init_4(uint8_t device_idx)
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_CNT_MEAS2);  // 16-bit at 100 Hz
 }
 
+
 void _m_mpu9250_calibrate_gyro()  {} // TODO-hi (see bolderflight/mpu9250.cpp:637)
+
+
+void _blink_yes_or_no(bool equality)
+{
+  if (equality)
+  {
+    m_green(ON);
+    _delay_ms(LED_DELAY_MS);
+    m_green(OFF);
+    _delay_ms(LED_DELAY_MS);
+  }
+  else
+  {
+    m_red(ON);
+    _delay_ms(LED_DELAY_MS);
+    if (!IGNORE_BAD_WHOAMI)  { while(1); }
+    m_red(OFF);
+    _delay_ms(LED_DELAY_MS);
+  }
+}

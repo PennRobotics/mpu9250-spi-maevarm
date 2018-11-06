@@ -19,7 +19,7 @@ int main()
   m_spi_init();
   m_spi_speed(SPI_250KHZ);
   m_mpu9250_init();
-  m_mpu9250_fast_mode(PIN_D1);  // TODO-lo: Eventually use a for-loop lookup
+  m_mpu9250_fast_mode(PIN_D1);
   m_mpu9250_fast_mode(PIN_D2);
   m_spi_speed(SPI_2MHZ);
   m_usb_init();

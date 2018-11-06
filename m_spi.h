@@ -18,6 +18,8 @@ typedef enum
   SPI_8MHZ
 } spi_freq_t;
 
+spi_freq_t _spi_freq;
+
 void m_spi_init();
 void m_spi_speed(spi_freq_t);
 uint8_t read_spi_byte();
