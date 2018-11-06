@@ -322,7 +322,7 @@ void _m_ak8963_init_4(uint8_t device_idx)  // CONTINUOUS MODE
 }
 
 
-void _m_mpu9250_calibrate_gyro(uint8_t device_idx) // TODO-hi (see bolderflight/mpu9250.cpp:637)
+void _m_mpu9250_calibrate_gyro(uint8_t device_idx)
 {
   m_red(ON); m_green(ON);  // Don't move the IMU when both LEDs are lit
 
