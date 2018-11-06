@@ -1,10 +1,11 @@
 #include "mpu9250.h"
+#include "m_usb.h"
 
 m2_gpio_t imu_pin_list[NUM_IMU] = {PIN_D1, PIN_D2};
 
 void m_mpu9250_init()
 {
- uint8_t device_idx;
+  uint8_t device_idx;
   for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
   {
     m2_gpio_t cs_pin = imu_pin_list[device_idx];
@@ -136,6 +137,30 @@ void m_mpu9250_fast_mode(uint8_t device_idx)
 }
 
 
+void m_mpu9250_dump_all_registers()
+{
+  uint8_t device_idx;
+  for (device_idx = 0; device_idx < NUM_IMU; device_idx++)
+  {
+    m2_gpio_t cs_pin = imu_pin_list[device_idx];
+    uint8_t reg, val;
+
+    m_usb_tx_uint(device_idx);
+    m_usb_tx_string("-INDEX DEVICE:\n");
+
+    for (reg = 0; reg < 0x7E; reg++) {
+      if ((reg == 0x6F) || (reg == 0x74))  { continue; }
+      val = m_read_spi_register(cs_pin, reg);
+      m_usb_tx_string("REG 0x");
+      m_usb_tx_hexchar(reg);
+      m_usb_tx_string(" = ");
+      m_usb_tx_uint(val);
+      m_usb_tx_char('\n');
+    }
+  }
+}
+
+
 void m_read_spi_mag_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count, uint8_t *dest)
 {
 #ifndef  I2C_READ_FLAG
@@ -255,7 +280,7 @@ void _m_ak8963_init()
 }
 
 
-void _m_ak8963_init_1(uint8_t device_idx)
+void _m_ak8963_init_1(uint8_t device_idx)  // WHOAMI
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   uint8_t whoami_compass[1] = {0xFF};
@@ -265,7 +290,7 @@ void _m_ak8963_init_1(uint8_t device_idx)
 }
 
 
-void _m_ak8963_init_2(uint8_t device_idx)
+void _m_ak8963_init_2(uint8_t device_idx)  // FUSE ROM MODE
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_FUSE_ROM);
@@ -273,7 +298,7 @@ void _m_ak8963_init_2(uint8_t device_idx)
 
 
 // 4912 = magnetic flux density, in uT; 32760 = 16-bit max of AK8963
-void _m_ak8963_init_3(uint8_t device_idx)
+void _m_ak8963_init_3(uint8_t device_idx)  // GET MAG SENSITIVITY ADJUSTMENTS
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   m_read_spi_mag_registers(cs_pin, AK8963_ASA, 3, _buffer);  // Get 3 bytes: vx, vy, vz
@@ -284,7 +309,7 @@ void _m_ak8963_init_3(uint8_t device_idx)
 }
 
 
-void _m_ak8963_init_4(uint8_t device_idx)
+void _m_ak8963_init_4(uint8_t device_idx)  // CONTINUOUS MODE
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_CNT_MEAS2);  // 16-bit at 100 Hz

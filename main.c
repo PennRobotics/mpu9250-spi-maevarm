@@ -43,6 +43,7 @@ int main()
     if (m_usb_rx_available())
     {
       incoming = m_usb_rx_char();
+      uint8_t idx;
       switch (incoming)
       {
         case 'G':
@@ -53,6 +54,62 @@ int main()
           stream = OFF;
           m_green(OFF);
           break;
+        case '1':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_1046HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_8800HZ);
+          }
+        case '2':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_420HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_3600HZ_HISPD);
+          }
+        case '3':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_218HZ_B);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_250HZ);
+          }
+        case '4':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_218HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_184HZ);
+          }
+        case '5':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_99HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_92HZ);
+          }
+        case '6':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_45HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_41HZ);
+          }
+        case '7':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_21HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_20HZ);
+          }
+        case '8':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_10HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_10HZ);
+          }
+        case '9':
+          for (idx = 0; idx < NUM_IMU; idx++)
+          {
+            m_mpu9250_set_accel_lpf(idx, ACC_LPF_5HZ);
+            m_mpu9250_set_gyro_lpf(idx, GY_LPF_5HZ);
+          }
+        case '*':
+          m_mpu9250_dump_all_registers();
         default:
           break;
       }

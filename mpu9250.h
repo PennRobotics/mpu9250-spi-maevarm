@@ -98,6 +98,7 @@ void m_mpu9250_set_gyro(uint8_t, g_range_t);
 void m_mpu9250_set_accel_lpf(uint8_t, lpf_accel_bw_t);
 void m_mpu9250_set_gyro_lpf(uint8_t, lpf_gyro_bw_t);
 void m_mpu9250_fast_mode(uint8_t);
+void m_mpu9250_dump_all_registers();
 void m_read_spi_mag_registers(m2_gpio_t, uint8_t, uint8_t, uint8_t*);
 void m_write_spi_mag_register(m2_gpio_t, uint8_t, uint8_t);
 uint8_t m_read_spi_register(m2_gpio_t, uint8_t);
