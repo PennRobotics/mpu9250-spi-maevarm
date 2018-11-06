@@ -8,6 +8,9 @@
 #define  NUM_IMU  2
 
 #define  IGNORE_BAD_WHOAMI  true
+#define  CALIBRATE_GYRO  true
+#define  NUM_CALIBRATION_SAMPLES  128
+
 #define  LED_DELAY_MS  250
 
 #define  CS_D1()  set(DDRD, 1)
@@ -90,6 +93,10 @@ lpf_gyro_bw_t _gyro_lpf_bandwidth[NUM_IMU];
 
 uint8_t _srd[NUM_IMU];
 
+int32_t _gx_bias[NUM_IMU];
+int32_t _gy_bias[NUM_IMU];
+int32_t _gz_bias[NUM_IMU];
+
 
 // FUNCTIONS
 void m_mpu9250_init();
@@ -113,7 +120,7 @@ void _m_ak8963_init_1(uint8_t);
 void _m_ak8963_init_2(uint8_t);
 void _m_ak8963_init_3(uint8_t);
 void _m_ak8963_init_4(uint8_t);
-void _m_mpu9250_calibrate_gyro();
+void _m_mpu9250_calibrate_gyro(uint8_t);
 void _blink_yes_or_no(bool);
 
 #define  ACCEL_OUT         0x3B

@@ -59,9 +59,9 @@ void m_mpu9250_init()
     m2_gpio_t cs_pin = imu_pin_list[device_idx];
 
     m_write_spi_register(cs_pin, PWR_MGMT_1, CLK_PLL);  // Clock source
-    m_read_spi_mag_registers(cs_pin, AK8963_HXL, 7, _buffer);  // Get 7 bytes of data from magnetometer at sample rate
+    m_read_spi_mag_registers(cs_pin, AK8963_HXL, 7, _buffer);  // Get 7 bytes of data from mag
 
-    _m_mpu9250_calibrate_gyro(cs_pin);
+    if (CALIBRATE_GYRO)  { _m_mpu9250_calibrate_gyro(device_idx); }
   }
   // Done!
 }
@@ -166,11 +166,11 @@ void m_read_spi_mag_registers(m2_gpio_t cs_pin, uint8_t start_reg, uint8_t count
 #ifndef  I2C_READ_FLAG
 #define  I2C_READ_FLAG  0x80
 #endif
-m_write_spi_register(cs_pin, I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Set slave 0 to AK8963 for reading
-m_write_spi_register(cs_pin, I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
-m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C and request 'count' bytes
-_delay_ms(5);
-m_read_spi_registers(cs_pin, EXT_SENS_DATA_00, count, dest);
+  m_write_spi_register(cs_pin, I2C_SLV0_ADDR, AK8963_I2C_ADDR | I2C_READ_FLAG);  // Mag reads to SLV0
+  m_write_spi_register(cs_pin, I2C_SLV0_REG, start_reg);  // Set first AK8963 register to read
+  m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | count);  // Enable I2C, get 'count' bytes
+  _delay_ms(5);
+  m_read_spi_registers(cs_pin, EXT_SENS_DATA_00, count, dest);
 }
 
 
@@ -179,7 +179,7 @@ void m_write_spi_mag_register(m2_gpio_t cs_pin, uint8_t reg, uint8_t val)
   m_write_spi_register(cs_pin, I2C_SLV0_ADDR, AK8963_I2C_ADDR);  // Set slave 0 to AK8963 for writing
   m_write_spi_register(cs_pin, I2C_SLV0_REG, reg);  // Set AK8963 register for writing
   m_write_spi_register(cs_pin, I2C_SLV0_DO, val);  // Store the data for writing
-  m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | (uint8_t)1);  // Enable I2C and send 1 byte
+  m_write_spi_register(cs_pin, I2C_SLV0_CTRL, I2C_SLV0_EN | (uint8_t)1);  // Enable I2C, send 1 byte
   _delay_ms(5);
   // TODO-lo: read same register on AK8963 to confirm write successful
 }
@@ -272,20 +272,22 @@ void _setup_pin_as_chip_select(m2_gpio_t cs_pin)
 
 void _m_ak8963_init()
 {
-  uint8_t device_idx;
-  for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_1(device_idx); } _delay_ms(100);
-  for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_2(device_idx); } _delay_ms(100);
-  for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_3(device_idx); } _delay_ms(100);
-  for (device_idx = 0; device_idx < NUM_IMU; device_idx++)  { _m_ak8963_init_4(device_idx); } _delay_ms(100);
+  uint8_t idx;
+  for (idx = 0; idx < NUM_IMU; idx++)  { _m_ak8963_init_1(idx); }  _delay_ms(100);
+  for (idx = 0; idx < NUM_IMU; idx++)  { _m_ak8963_init_2(idx); }  _delay_ms(100);
+  for (idx = 0; idx < NUM_IMU; idx++)  { _m_ak8963_init_3(idx); }  _delay_ms(100);
+  for (idx = 0; idx < NUM_IMU; idx++)  { _m_ak8963_init_4(idx); }  _delay_ms(100);
 }
 
 
 void _m_ak8963_init_1(uint8_t device_idx)  // WHOAMI
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
   uint8_t whoami_compass[1] = {0xFF};
   m_read_spi_mag_registers(cs_pin, AK8963_WHO_AM_I, 1, whoami_compass);
   _blink_yes_or_no(whoami_compass[0] == 0x48);
+
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
 }
 
@@ -293,6 +295,7 @@ void _m_ak8963_init_1(uint8_t device_idx)  // WHOAMI
 void _m_ak8963_init_2(uint8_t device_idx)  // FUSE ROM MODE
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_FUSE_ROM);
 }
 
@@ -301,10 +304,12 @@ void _m_ak8963_init_2(uint8_t device_idx)  // FUSE ROM MODE
 void _m_ak8963_init_3(uint8_t device_idx)  // GET MAG SENSITIVITY ADJUSTMENTS
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
   m_read_spi_mag_registers(cs_pin, AK8963_ASA, 3, _buffer);  // Get 3 bytes: vx, vy, vz
   _mag_scale_x[device_idx] = ((((float)_buffer[0]) - 128.0f) / 256.0f + 1.0f) * 4912.0f / 32760.0f;
   _mag_scale_y[device_idx] = ((((float)_buffer[1]) - 128.0f) / 256.0f + 1.0f) * 4912.0f / 32760.0f;
   _mag_scale_z[device_idx] = ((((float)_buffer[2]) - 128.0f) / 256.0f + 1.0f) * 4912.0f / 32760.0f;
+
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);
 }
 
@@ -312,11 +317,79 @@ void _m_ak8963_init_3(uint8_t device_idx)  // GET MAG SENSITIVITY ADJUSTMENTS
 void _m_ak8963_init_4(uint8_t device_idx)  // CONTINUOUS MODE
 {
   m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
   m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_CNT_MEAS2);  // 16-bit at 100 Hz
 }
 
 
-void _m_mpu9250_calibrate_gyro()  {} // TODO-hi (see bolderflight/mpu9250.cpp:637)
+void _m_mpu9250_calibrate_gyro(uint8_t device_idx) // TODO-hi (see bolderflight/mpu9250.cpp:637)
+{
+  m_red(ON); m_green(ON);  // Don't move the IMU when both LEDs are lit
+
+  m2_gpio_t cs_pin = imu_pin_list[device_idx];
+
+  // Temporarily set range, bandwidth, sample rate divider
+  g_range_t temp_gyro_range = _gyro_range[device_idx];
+  lpf_gyro_bw_t temp_gyro_lpf_bandwidth = _gyro_lpf_bandwidth[device_idx];
+  uint8_t temp_srd = _srd[device_idx];
+
+  m_mpu9250_set_gyro(device_idx, GYRO_250DPS);
+  m_mpu9250_set_gyro_lpf(device_idx, GY_LPF_20HZ);
+
+  // Sample rate setting is a bit complicated...
+  // TODO-lo: Move this into its own function
+  m_write_spi_register(cs_pin, SMPDIV, 19);
+  m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);  // Turn off compass
+  _delay_ms(100);
+  m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_CNT_MEAS1);  // 16-bit at 8 Hz
+  _delay_ms(100);
+  m_read_spi_mag_registers(cs_pin, AK8963_HXL, 7, _buffer);  // Get 7 bytes of data from mag
+  m_write_spi_register(cs_pin, SMPDIV, 19);
+
+  // Take samples, find bias
+  _gx_bias[device_idx] = 0;
+  _gy_bias[device_idx] = 0;
+  _gz_bias[device_idx] = 0;
+
+  for (size_t i=0; i < NUM_CALIBRATION_SAMPLES; i++)
+  {
+    // Read IMU data
+    m_read_spi_registers(PIN_D1, ACCEL_OUT, 21, _buffer);
+
+    int16_t _gx = (((int16_t)_buffer[8]) << 8) | _buffer[9];
+    int16_t _gy = (((int16_t)_buffer[10]) << 8) | _buffer[11];
+    int16_t _gz = (((int16_t)_buffer[12]) << 8) | _buffer[13];
+
+    // Accumulate bias
+    _gx_bias[device_idx] += _gx;
+    _gy_bias[device_idx] += _gy;
+    _gz_bias[device_idx] += _gz;
+
+    _delay_ms(20);
+  }
+
+  _gx_bias[device_idx] /= NUM_CALIBRATION_SAMPLES;
+  _gy_bias[device_idx] /= NUM_CALIBRATION_SAMPLES;
+  _gz_bias[device_idx] /= NUM_CALIBRATION_SAMPLES;
+
+  // Restore range, bandwidth, sample rate divider
+  m_mpu9250_set_gyro(device_idx, temp_gyro_range);
+  m_mpu9250_set_gyro_lpf(device_idx, temp_gyro_lpf_bandwidth);
+
+  // Sample rate setting is a bit complicated...
+  // TODO-lo: Call the set_srd function after it is created
+  m_write_spi_register(cs_pin, SMPDIV, 19);
+  m_write_spi_mag_register(cs_pin, AK8963_CNTL1, AK8963_PWR_DOWN);  // Turn off compass
+  _delay_ms(100);
+  m_write_spi_mag_register(cs_pin, AK8963_CNTL1, (temp_srd > 9) ?
+                                                  AK8963_CNT_MEAS1 :  // 16-bit at 8 Hz
+                                                  AK8963_CNT_MEAS2);  // 16-bit at 100 Hz
+  _delay_ms(100);
+  m_read_spi_mag_registers(cs_pin, AK8963_HXL, 7, _buffer);  // Get 7 bytes of data from mag
+  m_write_spi_register(cs_pin, SMPDIV, temp_srd);
+
+  m_red(OFF); m_green(OFF);
+}
 
 
 void _blink_yes_or_no(bool equality)
