@@ -2,19 +2,19 @@
 _reads 9-DOF inertial measurement unit (IMU) data to a MAEVARM M2 microcontroller via SPI_
 
 ### Definitions
-`NUM_IMU  =  2`
-`IGNORE_BAD_WHOAMI  =  true`
-`LED_DELAY_MS  =  250`
+`NUM_IMU  =  2`  
+`IGNORE_BAD_WHOAMI  =  true`  
+`LED_DELAY_MS  =  250`  
 
 
 ### Pinout
-D1 - Chip Select IMU 0
-D2 - Chip Select IMU 1
-B0 - Chip Select for SPI (do not connect)
-B1 - SPI Clock
-B2 - SPI MOSI
-B3 - SPI MISO
-_An MPU-9250 operates at 3.3V. The MAEVARM M2 operates at 5V._
+D1 - Chip Select IMU 0  
+D2 - Chip Select IMU 1  
+B0 - Chip Select for SPI (do not connect)  
+B1 - SPI Clock  
+B2 - SPI MOSI  
+B3 - SPI MISO  
+_An MPU-9250 operates at 3.3V. The MAEVARM M2 operates at 5V._  
 
 
 ### API Reference
