@@ -410,3 +410,24 @@ void _blink_yes_or_no(bool equality)
     _delay_ms(LED_DELAY_MS);
   }
 }
+
+
+// TODO: create functions for reading solely accel, gyro, mag
+//   however, keep the bulk read function as it is presumably faster
+//   each function should have the option of enabling or disabling bias removal
+
+// TODO: FIFO enable
+
+// TODO: FIFO disable
+
+// TODO: FIFO requires more flags and changes to register-setting statements throughout
+
+// TODO-lo: wake on motion
+
+// TODO-lo: use on-board DMP
+
+// TODO-lo: accel calibration
+
+// TODO-lo: mag calibration
+
+// TODO-lo: changes to reduce power consumption and/or sleep

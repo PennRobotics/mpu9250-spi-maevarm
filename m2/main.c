@@ -11,7 +11,7 @@ uint8_t _buffer[21] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0};
 int16_t data[20] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 uint32_t *time_ptr = (uint32_t*)&data;
 
-// TODO-lo: Transform accel and gyro to match magnetometer (see bolderflight/mpu9250.h:189)
+// TODO-lo: Transform accel and gyro axes to match magnetometer (see bolderflight/mpu9250.h:189)
 
 int main()
 {
@@ -31,6 +31,7 @@ int main()
 
     m_read_spi_registers(PIN_D1, ACCEL_OUT, 21, _buffer);
     for (i = 0; i <  3; i++)  { data[i+2] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
+    // TODO: remove data biases/drift from each
     for (i = 4; i <  7; i++)  { data[i+1] = (((int16_t)_buffer[2*i]) << 8) | _buffer[2*i+1]; }
     for (i = 7; i < 10; i++)  { data[i+1] = (((int16_t)_buffer[2*i+1]) << 8) | _buffer[2*i]; }
 
