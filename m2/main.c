@@ -67,6 +67,18 @@ int main()
         case '4':
           for (idx = 0; idx < NUM_IMU; idx++)  { m_mpu9250_set_accel(idx, ACCEL_16G); }
           break;
+        case 'a':
+          for (idx = 0; idx < NUM_IMU; idx++)  { m_mpu9250_set_gyro(idx, GYRO_250DPS); }
+          break;
+        case 'b':
+          for (idx = 0; idx < NUM_IMU; idx++)  { m_mpu9250_set_gyro(idx, GYRO_500DPS); }
+          break;
+        case 'c':
+          for (idx = 0; idx < NUM_IMU; idx++)  { m_mpu9250_set_gyro(idx, GYRO_1000DPS); }
+          break;
+        case 'd':
+          for (idx = 0; idx < NUM_IMU; idx++)  { m_mpu9250_set_gyro(idx, GYRO_2000DPS); }
+          break;
         case '*':
           m_mpu9250_dump_all_registers();
           break;
@@ -76,6 +88,7 @@ int main()
     }
   }
 }
+// TODO: gyro offset probably needs to be scaled if gyro range is changed
 
 
 void setup_timer()
