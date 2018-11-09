@@ -11,6 +11,8 @@ uint8_t _buffer[21] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0};
 int16_t data[20] = {0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0};
 uint32_t *time_ptr = (uint32_t*)&data;
 
+void m_mpu9250_dump_one_config_register();  // TODO-debug
+
 // TODO-lo: Transform accel and gyro axes to match magnetometer (see bolderflight/mpu9250.h:189)
 
 int main()
@@ -79,6 +81,9 @@ int main()
         case 'd':
           for (idx = 0; idx < NUM_IMU; idx++)  { m_mpu9250_set_gyro(idx, GYRO_2000DPS); }
           break;
+        case 'A':
+          m_mpu9250_dump_one_config_register();  // TODO-debug
+          break;
         case '*':
           m_mpu9250_dump_all_registers();
           break;
@@ -115,4 +120,13 @@ ISR(TIMER1_COMPA_vect)
     (*time_ptr)++;
   }
 }
+
+void m_mpu9250_dump_one_config_register()
+{
+  m2_gpio_t cs_pin = imu_pin_list[0];
+
+  uint8_t val = m_read_spi_register(cs_pin, ACCEL_CONFIG);
+  m_usb_tx_char(val);
+}
+
 
