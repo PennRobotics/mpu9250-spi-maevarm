@@ -81,9 +81,9 @@ void m_mpu9250_set_accel(uint8_t device_idx, a_range_t accel_range)
   _accel_range[device_idx] = accel_range;
 
   spi_freq_t current_freq = _spi_freq;  // Slow down SPI as needed
-  if ((uint8_t)current_freq > (uint8_t)SPI_1MHZ)  { m_spi_speed(SPI_1MHZ); }
+  if ((uint8_t)current_freq > (uint8_t)SPI_250KHZ)  { m_spi_speed(SPI_250KHZ); }
   m_write_spi_register(cs_pin, ACCEL_CONFIG, accel_range);
-  if ((uint8_t)current_freq > (uint8_t)SPI_1MHZ)  { m_spi_speed(current_freq); }
+  if ((uint8_t)current_freq > (uint8_t)SPI_250KHZ)  { m_spi_speed(current_freq); }
 }
 
 

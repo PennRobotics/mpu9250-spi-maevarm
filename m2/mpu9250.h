@@ -8,7 +8,7 @@
 #define  NUM_IMU  2
 
 #define  IGNORE_BAD_WHOAMI  true
-#define  CALIBRATE_GYRO  true
+#define  CALIBRATE_GYRO  false
 #define  NUM_CALIBRATION_SAMPLES  128
 
 #define  LED_DELAY_MS  250
