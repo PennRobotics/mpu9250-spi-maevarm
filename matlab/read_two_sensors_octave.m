@@ -1,8 +1,8 @@
 clear all;
 
-SERIAL_PORT = '/dev/tty.usbmodem411';
-%SERIAL_PORT = '/dev/ttyACM0';
-SERIAL_PORT = '/dev/tty';
+%SERIAL_PORT = '/dev/tty.usbmodem411';
+SERIAL_PORT = '/dev/ttyACM0';
+%SERIAL_PORT = '/dev/tty';
 BAUD_RATE = 115200;
 
 pkg load instrument-control
@@ -39,6 +39,7 @@ while i < points * values
         stream(i : i + ints - 1) = srl_read(h, ints);
     end_try_catch
     i = i + ints;
+    sleep(0.05)
 end
 toc
 srl_write(h, 'S');
